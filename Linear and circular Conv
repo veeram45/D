@@ -1,0 +1,79 @@
+x = input('Enter a sequence');
+y = input('Enter a sequence');
+l1 = length(x);
+l2 = length(y);
+l = l1+l2-1;
+for j = 1:(l-l2)
+ y = [y 0];
+end
+ a = flip(y);
+ result = [];
+for i = 1:l
+ b = circshift(a,i);
+ c = b(1:l1);
+ d = sum(x.*c)
+result = [result d];
+end
+sgtitle('Linear Convolution')
+subplot(3,1,1);
+stem(1:l1,x,'r')
+xlabel('n(No. of samples)')
+title('x[n]')
+y = y(1:l2);
+subplot(3,1,2);
+stem(1:l2,y,'b')
+xlabel('n(No.of samples)')
+title('h[n]')
+subplot(3,1,3);
+stem(1:l,result,'r')
+xlabel('n(No. of samples)')
+title('y[n]')
+
+CIRCULAR CONVOLUTION:
+x = input('Enter a sequence');
+y = input('Enter a sequence');
+l1 = length(x);
+l2 = length(y);
+result = [];
+xx = x;
+yy = y;
+if(l1==l2)
+ a = flip(y);
+ for i =1:l1
+ b = circshift(a,i);
+ result = [result sum(x.*b)];
+ end
+else
+ if(l1>l2)
+ for j = 1:l1-l2
+ y = [y 0];
+ end
+ a = flip(y);
+ for i =1:l1
+ b = circshift(a,i);
+ result = [result sum(x.*b)];
+ end
+ else
+ for j = 1:l2-l1
+ x = [x 0];
+ end
+ a = flip(y);
+ for i =1:l2
+ b = circshift(a,i);
+ result = [result sum(x.*b)]
+ end
+ end
+end
+subplot(3,1,1)
+stem(1:l1,xx,'r')
+xlabel('n(No. of samples)')
+title('x[n]')
+subplot(3,1,2)
+stem(1:l2,yy,'r')
+xlabel('n(No. of samples)')
+title('h[n]')
+subplot(3,1,3)
+stem(1:length(result),result,'r')
+xlabel('n(No. of samples)')
+title('y[n]')
+sgtitle('Circular Convolution')

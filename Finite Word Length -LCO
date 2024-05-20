@@ -1,0 +1,32 @@
+clc; 
+clear; 
+close all;
+bits=5;
+a=-1/2; 
+aq=round(a*2^bits)/2^bits;
+b=1;
+N=100;
+x=zeros(1,N); x(1) = 1; % x(n) = unit impulse signal
+y=filter(b,a, x); % original output
+yqnm1=0;
+ynm1=0;
+for n=0:N-1;
+ y(n+1)=x(n+1)+aq*ynm1;
+ ynm1=y(n+1);
+ 
+ yq(n+1)=round((x(n+1)+aq*yqnm1)*2^bits)/2^bits;
+ yqnm1=yq(n+1);
+ [y(n+1) yq(n+1)]
+end
+figure;
+subplot(2,1,1); 
+plot([0:N-1], y)
+title('Original output')
+xlabel('n(sample no)')
+ylabel('y[n]')
+subplot(2,1,2); 
+plot([0:N-1], yq)
+title('Quantized output')
+xlabel('n(Sample no)')
+ylabel('yq[n]')
+sgtitle('a=-1/2')

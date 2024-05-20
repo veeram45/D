@@ -1,0 +1,76 @@
+clear;
+close all;
+
+fm = 100; 
+fs = 5000;
+Nfft = 8;
+
+h = [5 6 0 3 5];
+H = fft(h,Nfft);
+M = length(h);
+
+t = 0:1/fs:1/fm; 
+xt = 2*sin(2*fm*pi*t);
+
+n = 1:fs/fm;
+N = length(n);
+x = 2*sin(2*fm*pi*n/fs);
+
+Ny=M+N-1;
+
+L = Nfft-M+1;
+
+K = ceil(N/L);
+
+y1 = [zeros(1,M-1)];
+if(isa((K*L)/N,"double"))
+ xe=[x,zeros(1,(K*L)-N)];
+end
+
+for i = 0:K-1
+ init = L*i +1; 
+ final = L*(i+1);
+ xi = xe(init:final);
+Xi = fft(xi,Nfft);
+ Yi = Xi.*H;
+ yi = ifft(Yi);
+ y1 = [y1(1:end-M+1),yi(1:M-1)+y1(end-M+2:end),yi(M:end)];
+end
+xprev = [zeros(1,M-1)];
+y2 = [];
+x1 = [xe,zeros(1,M-1)];
+% Overlap Save loop
+for j= 0:K
+ init = L*j +1;
+ final = L*(j+1);
+ xj = [xprev,x1(init:final)];
+ xprev = x1(final-M+2:final);
+ Xj = fft(xj,Nfft);
+ Yj = Xj.*H;
+ yj = ifft(Yj);
+ y2 = [y2, yj(M:end)];
+end
+y3 = conv(x,h);
+figure(1);
+subplot(2,1,1)
+plot(t,xt)
+title('Continuous time signal over one period')
+xlabel('t(s)')
+ylabel('x(t)')
+subplot(2,1,2)
+stem(n,x)
+title(['Discrete time signal of ',num2str(ceil(fs/fm)),' samples'])
+xlabel('n(Sample number)')
+ylabel('x[n]')
+figure(2);stem(1:Ny,y1(1:Ny))
+title('Linear Convolution by DFT- Overlap Add')
+xlabel('n(Sample number)')
+ylabel('y[n]')
+figure(3);stem(1:Ny,y2(1:Ny))
+title('Linear Convolution by DFT- Overlap Save')
+xlabel('n(Sample number)')
+ylabel('y[n]')
+figure(4);stem(1:Ny,y3)
+title('Linear Convolution using "conv" function')
+xlabel('n(Sample Number)')
+ylabel('y[n]')

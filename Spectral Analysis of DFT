@@ -1,0 +1,92 @@
+clc;
+clear;
+close all;
+fs1 = 400;
+fs2 = 150;
+w1 = 100*pi;
+w2 = 150*pi;
+N1 = 8; 
+N2 = 64;
+N3 = 1024;
+t=0:1/1000:0.1;
+xt = 2*sin(w1*t)+3*sin(w2*t);
+figure(1); subplot(3,1,1)
+plot(t,xt)
+xlabel('t(s)')
+ylabel('x(t)')
+title('Continuous Time Signal')
+n=0:50;
+xn1 = 2*sin(w1*n/fs1)+3*sin(w2*n/fs1);
+subplot(3,1,2)
+stem(n,xn1)
+xlabel('n(No. of samples)')
+ylabel('x[n]')
+title('Discrete Time Signal at rate 400Hz')
+n=0:fs2;
+xn2 = 2*sin(w1*n/fs2)+3*sin(w2*n/fs2);
+subplot(3,1,3)
+stem(n,xn2)
+xlabel('n(No. of samples)')
+ylabel('x[n]')
+title('Discrete Time Signal at nyquist rate=150Hz')
+powerSpectrum(8,400,xn1,2,3,4,1)
+powerSpectrum(8,150,xn2,2,3,4,3)
+powerSpectrum(64,400,xn1,2,3,4,5)
+powerSpectrum(64,150,xn2,2,3,4,7)
+powerSpectrum(1024,400,xn1,2,3,4,9)
+powerSpectrum(1024,150,xn2,2,3,4,11)
+
+%power spectrum
+function Xf = powerSpectrum(N,fs,xn,fig,m,n,p)
+ [Xw,Xp] = dtft(N,fs,xn,fig+1,m,n,p);
+ m=3;
+ n=2;
+ v = [1,3,5,7,9,11];
+ p= find(v==p);
+ % Power of the Wave
+ f=(-N/2:N/2-1)*fs/N;
+ Xf=Xw.^2/N^2
+figure(fig);subplot(m,n,p)
+ sgtitle("Power Spectrum")
+ plot(f,Xf)
+ xlabel('f(Hz)')
+ ylabel('|X(f)|^2')
+ title(['Power Spectrum at ' num2str(N) 'samples and ' num2str(fs) 'Hz'])
+end
+
+%dtft
+function [Xw,Xp] = dtft(N,fs,xn,fig,m,n,p) 
+[Xmag,Xphase] = dft(N,fs,xn,fig+1,m,n,p);
+ w=(-N/2:N/2-1)*2*pi/N;
+ Xw=fftshift(Xmag); 
+ Xp = fftshift(Xphase);
+ 
+ figure(fig);subplot(m,n,p)
+ sgtitle('DTFT')
+ plot(w,Xw)
+ xlabel('w(rad/s)')
+ ylabel('|X(w)|')
+ title(['Magnitude Of DTFT at ',num2str(N),'samples and ',num2str(fs),'Hz'])
+ subplot(m,n,p+1)
+ plot(w,Xp)
+ xlabel('w(rad/s)')
+ ylabel('<X(w)')
+ title(['Phase Of DTFT at ',num2str(N),'samples and ',num2str(fs),'Hz'])
+end
+function [Xmag,Xphase] = dft(N,fs,xn,fig,m,n,p)
+k=0:N-1;
+X = fft(xn,N);
+Xmag = abs(X);
+Xphase = angle(X);
+figure(fig);subplot(m,n,p)
+sgtitle('DFT')
+stem(k,Xmag)
+xlabel('k(No. of Samples)')
+ylabel('|X(k)|')
+title(['Magnitude of DFT at ', num2str(N) ,'samples and ', num2str(fs),'Hz'])
+subplot(m,n,p+1)
+stem(k,Xphase)
+xlabel('k(No. of Samples)')
+ylabel('<X(k)')
+title(['Phase of DFT at ', num2str(N) ,'samples and ', num2str(fs),'Hz'])
+end

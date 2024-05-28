@@ -1,0 +1,48 @@
+clc; 
+clear all; 
+close all;
+% [a,fs]=audioread('jan1.wav');
+n=0:2e4; 
+fs=16e3; f1=2e3; f2=7e3;
+a=cos(2*pi*f1*n/fs)+cos(2*pi*f2*n/fs);
+% a=cos(4000*pi*n/fs);
+fsin=fs;
+%decimation
+D=2; I=1; b=a; % no decimation/interpolation
+fsout=fsin*I/D;
+h=fir1(32,1/D); %filter
+b1=a(1:D:end);
+v=filter(h,1,a);
+b=v(1:D:end);
+t=[0:length(a)-1]/fsin;
+subplot(4,2,1); plot(t, a); title('Original Signal'); xlabel('t(s)'); axis([0 10e-3 -2 2])
+subplot(4,2,2); pspectrum(a, fsin); axis([0 fsin/2000 -30 10])
+tb1=[0:length(b)-1]/fsout;
+subplot(4,2,3); plot(tb1, b1); title('Decimated Signal'); xlabel('t(s)'); axis([0 10e-3 -2 2])
+subplot(4,2,4); pspectrum(b1, fsout); axis([0 fsout/2000 -30 10])
+tv=[0:length(v)-1]/fsin;
+subplot(4,2,5); plot(tv, v); title('Original-Filtered');xlabel('t(s)'); axis([0 10e-3 -2 2])
+subplot(4,2,6); pspectrum(v, fsin); axis([0 fsin/2000 -30 10])
+tb=[0:length(b)-1]/fsout;
+subplot(4,2,7); plot(tb, b); title('Filtered-Decimated'); xlabel('t(s)'); axis([0 10e-3 -2 2])
+subplot(4,2,8); pspectrum(b, fsout); axis([0 fsout/2000 -30 10])
+%Interpolation
+D=1; I=4; b=a; % no decimation/interpolation
+fsout=fsin*I/D;
+h=fir1(32,1/I); %filter
+v=zeros(1, length(a)*I);
+v(1:I:end)=a;
+b=filter(h,1,v);
+% sound(a,fsin)
+% sound(b1,fsout)
+% sound(b,fsout)
+figure;
+t=[0:length(a)-1]/fsin;
+subplot(3,2,1); plot(t, a);title('Original Signal'); xlabel('t(s)');axis([0 10e-3 -2 2])
+subplot(3,2,2); pspectrum(a, fsin); axis([0 fsin/2000 -30 10])
+tv=[0:length(v)-1]/fsout;
+subplot(3,2,3); plot(tv, v);title('Interpolated Siganl'); xlabel('t(s)'); axis([0 10e-3 -2 2])
+subplot(3,2,4); pspectrum(v, fsout); axis([0 fsout/2000 -30 10])
+tb=[0:length(b)-1]/fsout;
+subplot(3,2,5); plot(tb, b);title('Interpolated-Filtered'); xlabel('t(s)'); axis([0 10e-3 -2 2])
+subplot(3,2,6); pspectrum(b, fsout); axis([0 fsout/2000 -30 10])

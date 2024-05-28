@@ -1,0 +1,51 @@
+clc;
+clear all;
+close all;
+x=input('Input sequence:');
+I=input('Interpolation factor:');
+D=input('Decimation factor:');
+N=length(x);
+n=0:1:N-1;
+subplot(311);
+stem(n,x,'b');
+grid on;
+title('Input Sequence x(n)');
+xlabel('time');
+ylabel('Amplitude of x(n)');
+y=[zeros(1,I*N)];
+k=0;
+for i=1:1:I*N
+ if mod(i-1,I)==0
+ k=k+1;
+ y(i)=x(k);
+ else
+ y(i)=0;
+
+ end
+end
+ j=0:1:(I*N)-1;
+ subplot(312);
+ stem(j,y,'b');
+ grid on;
+ title('Interpolated Sequence');
+ xlabel('time');
+ ylabel('Amplitude of x(n)');
+ p=0;
+ for i=1:1:N
+ if mod(i-1,D)==0
+ p=p+1;
+ z(p)=x(i);
+ end
+ end
+ if mod((N/D),1)==0
+ m=(N/D)-1
+ else
+ m=floor(N/D);
+ end
+ n1=0:1:m;
+ subplot(313);
+ stem(n1,z,'b');
+ grid on;
+ title('Decimated Sequence');
+ xlabel('time');
+ ylabel('Amplitude of x(n)');
